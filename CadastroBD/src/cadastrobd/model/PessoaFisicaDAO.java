@@ -72,7 +72,7 @@ public class PessoaFisicaDAO {
             conn = ConectorBD.getConnection();
             conn.setAutoCommit(false);
 
-            int idPessoa = SequenceManager.getNextValue(conn, "NomeDaSequenciaPessoa");
+            int idPessoa = SequenceManager.getNextValue(conn, "Seq_idPessoa");
 
             String sqlPessoa = "INSERT INTO Pessoa (idPessoa, nome, logradouro, cidade, estado, telefone, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
             pstmtPessoa = conn.prepareStatement(sqlPessoa);
@@ -92,16 +92,12 @@ public class PessoaFisicaDAO {
             pstmtPessoaFisica.executeUpdate();
 
             conn.commit();
-            return true;
+        return true;
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                }
-            }
+            e.printStackTrace();
             return false;
-        } finally {
+            
+            } finally {
             Statement generatedKeys = null;
             ConectorBD.close(generatedKeys);
             ConectorBD.close(pstmtPessoa);
@@ -136,35 +132,69 @@ public class PessoaFisicaDAO {
             pstmtPessoaFisica.executeUpdate();
 
             conn.commit();
-
+            return true;
         } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
-            return false;
     }
 
     public boolean excluir(int id) {
-        String sqlPessoaFisica = "DELETE FROM PessoaFisica WHERE Pessoa_idPessoa = ?";
-        String sqlPessoa = "DELETE FROM Pessoa WHERE idPessoa = ?";
+    String sqlDeleteMovimentos = "DELETE FROM Movimento WHERE Pessoa_idPessoa = ?";
+    String sqlDeletePessoaFisica = "DELETE FROM PessoaFisica WHERE Pessoa_idPessoa = ?";
+    String sqlDeletePessoa = "DELETE FROM Pessoa WHERE idPessoa = ?";
 
-        try (Connection conn = ConectorBD.getConnection();
-             PreparedStatement pstmtPessoaFisica = conn.prepareStatement(sqlPessoaFisica);
-             PreparedStatement pstmtPessoa = conn.prepareStatement(sqlPessoa)) {
+    try (Connection conn = ConectorBD.getConnection();
+         PreparedStatement pstmtDeleteMovimentos = conn.prepareStatement(sqlDeleteMovimentos);
+         PreparedStatement pstmtDeletePessoaFisica = conn.prepareStatement(sqlDeletePessoaFisica);
+         PreparedStatement pstmtDeletePessoa = conn.prepareStatement(sqlDeletePessoa)) {
 
-            conn.setAutoCommit(false);
+        conn.setAutoCommit(false);
 
-            
-            pstmtPessoaFisica.setInt(1, id);
-            pstmtPessoaFisica.executeUpdate();
+        pstmtDeleteMovimentos.setInt(1, id);
+        pstmtDeleteMovimentos.executeUpdate();
 
-            
-            pstmtPessoa.setInt(1, id);
-            pstmtPessoa.executeUpdate();
+        pstmtDeletePessoaFisica.setInt(1, id);
+        pstmtDeletePessoaFisica.executeUpdate();
 
-            conn.commit();
+        pstmtDeletePessoa.setInt(1, id);
+        pstmtDeletePessoa.executeUpdate();
+
+        conn.commit();
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
             return false;
+    } finally {;
         }
+    }
+    
+    public PessoaFisica getPessoaPorCpf(String cpf) {
+        PessoaFisica pessoaFisica = null;
+        String sql = "SELECT * FROM Pessoa INNER JOIN PessoaFisica ON Pessoa.idPessoa = PessoaFisica.Pessoa_idPessoa WHERE PessoaFisica.CPF = ?";
+
+        try (Connection conn = ConectorBD.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, cpf);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                pessoaFisica = new PessoaFisica(
+                        rs.getInt("idPessoa"),
+                        rs.getString("nome"),
+                        rs.getString("logradouro"),
+                        rs.getString("cidade"),
+                        rs.getString("estado"),
+                        rs.getString("telefone"),
+                        rs.getString("email"),
+                        rs.getString("CPF")
+                );
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pessoaFisica;
     }
 }

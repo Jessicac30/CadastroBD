@@ -10,38 +10,54 @@ public class CadastroBDTeste {
 
     public static void main(String[] args) {
         PessoaFisicaDAO pessoaFisicaDAO = new PessoaFisicaDAO();
-        PessoaJuridicaDAO pessoaJuridicaDAO = new PessoaJuridicaDAO();
 
-       
-        PessoaFisica pf = new PessoaFisica(0, "João", "Rua 12, casa 3, Quintanda", "Riacho do Sul", "PA", "1111-1111", "joao@riacho.com", "11111111111");
-        pessoaFisicaDAO.incluir(pf);
+        PessoaFisica pessoaExistente = pessoaFisicaDAO.getPessoaPorCpf("11111111111");
+        if (pessoaExistente != null) {
+            pessoaFisicaDAO.excluir(pessoaExistente.getId());
+        }
 
-       
-        pf.setNome("Pedro");
-        pessoaFisicaDAO.alterar(pf);
+        PessoaFisica novaPessoa = new PessoaFisica(0, "João", "Rua 12, casa 3, Quintanda", "Riacho do Sul", "PA", "1111-1111", "joao@riacho.com", "11111111111");
+        boolean sucessoInclusao = pessoaFisicaDAO.incluir(novaPessoa);
 
-       
-        List<PessoaFisica> listaPF = pessoaFisicaDAO.getPessoas();
-        listaPF.forEach(PessoaFisica::exibir);
 
-       
-        pessoaFisicaDAO.excluir(pf.getId());
+            novaPessoa.setNome("Pedro");
+            novaPessoa.setLogradouro("Rua nova, 456");
+            novaPessoa.setCidade("Nova Cidade");
+            novaPessoa.setEstado("SP");
+            novaPessoa.setTelefone("8765-4321");
+            novaPessoa.setEmail("pedro@email.com");
+            boolean sucessoAlteracao = pessoaFisicaDAO.alterar(novaPessoa);
 
-        
-        PessoaJuridica pj = new PessoaJuridica(0, "JJC", "Rua 11, Centro", "Riacho do Norte", "PA", "1212-1212", "jjc@riacho.com", "11111111111111");
-        pessoaJuridicaDAO.incluir(pj);
+            
+            List<PessoaFisica> pessoasFisicas = pessoaFisicaDAO.getPessoas();
+            System.out.println("Listando todas as pessoas físicas:");
+            for (PessoaFisica pf : pessoasFisicas) {
+                pf.exibir();
+            }
 
-        
-        pj.setNome("CCJ");
-        pessoaJuridicaDAO.alterar(pj);
+            boolean sucessoExclusao = pessoaFisicaDAO.excluir(novaPessoa.getId());
+            
+            PessoaJuridicaDAO pessoaJuridicaDAO = new PessoaJuridicaDAO();
 
-        
-        List<PessoaJuridica> listaPJ = pessoaJuridicaDAO.getPessoas();
-        listaPJ.forEach(PessoaJuridica::exibir);
+ 
+        PessoaJuridica novaPessoaJuridica = new PessoaJuridica(0, "JJC", "Rua 11, Centro", "Riacho do Norte", "PA", "1212-1212", "jjc@riacho.com", "11111111111111");
+        boolean sucessoInclusaoPJ = pessoaJuridicaDAO.incluir(novaPessoaJuridica);
+  
+            novaPessoaJuridica.setNome("CCJ");
+            novaPessoaJuridica.setLogradouro("Rua nova, 12");
+            novaPessoaJuridica.setCidade("Cidade Nova");
+            novaPessoaJuridica.setEstado("SP");
+            novaPessoaJuridica.setTelefone("8765-1123");
+            novaPessoaJuridica.setEmail("CCJ@email.com");
+            boolean sucessoAlteracaoPJ = pessoaJuridicaDAO.alterar(novaPessoaJuridica);
 
-        
-        pessoaJuridicaDAO.excluir(pj.getId());
+            List<PessoaJuridica> todasPessoasJuridicas = pessoaJuridicaDAO.getPessoas();
+            System.out.println("Listando todas as pessoas jurídicas:");
+            for (PessoaJuridica pj : todasPessoasJuridicas) {
+                pj.exibir();
+            }
+
+            boolean sucessoExclusaoPJ = pessoaJuridicaDAO.excluir(novaPessoaJuridica.getId());
     }
-    
 }
 

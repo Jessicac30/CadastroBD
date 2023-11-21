@@ -3,8 +3,8 @@ package cadastrobd.model;
 public class PessoaFisica extends Pessoa {
     private String cpf;
 
-
-    public PessoaFisica() {
+    
+    public PessoaFisica(String joão, String rua_12_casa_3, String riacho_do_Sul, String pa, String string, String joaoriachocom, String string1) {
         super();
     }
 
@@ -96,4 +96,18 @@ public class PessoaFisica extends Pessoa {
         super.exibir();
         System.out.println("CPF: " + cpf);
     }
+    
+    @Override
+    public String toString() {
+        return "PessoaFisica{" +
+               "id=" + getId() +
+               ", nome='" + getNome() + '\'' +
+               ", logradouro='" + getLogradouro() + '\'' +
+               ", cidade='" + getCidade() + '\'' +
+               ", estado='" + getEstado() + '\'' +
+               ", telefone='" + getTelefone() + '\'' +
+               ", email='" + getEmail() + '\'' +
+               ", cpf='" + cpf + '\'' +
+               '}';
+    }   
 }
